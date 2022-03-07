@@ -6,8 +6,8 @@ module.exports = (sequelize, DataTypes) => {
 
       // user.belongsToMany(models.group_cal, { foreignKey: "user_id" });
       // user.belongsToMany(models.group_routine, { foreignKey: "user_id" });
-      // user.hasOne(models.user_routine);
-
+      // user.hasMany(models.user_routine, { foreignKey: "user_id" });
+      
     }
   }
   user.init(

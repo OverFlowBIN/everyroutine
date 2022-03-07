@@ -1,9 +1,9 @@
 const router = require("express").Router();
-const controller = require("../controllers/users");
+const controller = require("../controllers/routine");
 
 
 // test : show whole user data
-router.get("/", controller.users.get);
+router.get("/", controller.user_routine.get);
 
 // check user before signup
 router.post("/signup-check", controller.signupCheck.post);

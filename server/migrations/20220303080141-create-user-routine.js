@@ -24,10 +24,20 @@ module.exports = {
       },
       user_cal_id: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        unique: true,
       },
       daily_check: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
       },
     });
   },

@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // user_routine.belongsTo(models.user, { as: "user_id", foreignKey: user });
-      // user_routine.belongsTo(models.user, { foreignKey: "user_id" });
+      user_routine.belongsTo(models.user, { foreignKey: "id" });
 
 
     }
@@ -25,10 +25,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         unique: true,
-        // references: {
-        //   model: "user",
-        //   key: "id"
-        // }
+        references: {
+          model: "users",
+          key: "id"
+        }
       },
       user_cal_id: {
         type: DataTypes.INTEGER,

@@ -1,4 +1,4 @@
-const { user } = require('../../models');
+const { user_routine } = require('../../models');
 const jwt = require("jsonwebtoken")
 
 module.exports = {
@@ -12,10 +12,10 @@ module.exports = {
 
 
   // test용 : user 전체 데이터 가져오기
-  users: {
+  user_routine: {
     get: async (req, res) => {
       // console.log(models);
-      user.findAll().then((data) => res.status(200).json(data));  
+      user_routine.findAll().then((data) => res.status(200).json(data));  
     }    
   },
 
@@ -76,40 +76,40 @@ module.exports = {
   // TODO: 회원 탈퇴 다시 물어보는창 만들껀지? -> 만들면 바디로 받고, 아니면 쿠키로 받는데 쿠키로 받아도 비번은 받아야됨
   // resign, clear cookie?
   resign: {
-    get: async (req, res) => {
+    post: async (req, res) => {
       // case.1 이메일과 비밀번호 받아서 삭제 요청 보내기 -> front방식에 따라 front 추가 작업 필요
-      // const { email, password } = await req.body;
+      const { email, password } = await req.body;
       
       // FIXME: 만약토큰으로 작업하면 이 부분으로 작업하기
-      function getCookie(name) {
-        let matches = req.headers.cookie.match(new RegExp(
-          "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-        ));
-        return matches ? decodeURIComponent(matches[1]) : undefined;
-      }
+      // function getCookie(name) {
+      //   let matches = req.headers.cookie.match(new RegExp(
+      //     "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+      //   ));
+      //   return matches ? decodeURIComponent(matches[1]) : undefined;
+      // }
 
-      const accessToken = getCookie('accessToken')
+      // const accessToken = getCookie('accessToken')
       
-      const { email } = jwt.verify(accessToken, process.env.ACCESS_SECRET);
+      // const { email } = jwt.verify(accessToken, process.env.ACCESS_SECRET);
       // console.log('email', email)
 
       try {
-        // if(!email || !password) {
-        //   // 이메일과 패쓰워드를 중 하나라도 받지 못하면 탈퇴 불가
-        //   return res.status(203).json({ data: null, message: "Please fill in all required spaces"});
-        // } else {
-        //   const findUser = await user.findOne({ where: {email, password} });
-        //   if(!findUser) {
-        //     // 이메일과 비번을 찾지 못한다 -> 제대로 기입을 안함
-        //     return res.status(202).json({ data: null, message: "incorrect ID or password" });
-        //   } else {
-        // 유저 정보 삭제하기
-        await user.destroy({ where: { email }});
-        // 쿠키에 토큰 삭제하기
-        await res.clearCookie("accessToken", { sameSite: "None", secure: true });
-        return res.status(200).json({ data: null, message: "Successfully account deleted"});
-          
-        // }
+        if(!email || !password) {
+          // 이메일과 패쓰워드를 중 하나라도 받지 못하면 탈퇴 불가
+          return res.status(203).json({ data: null, message: "Please fill in all required spaces"});
+        } else {
+          const findUser = await user.findOne({ where: {email, password} });
+          if(!findUser) {
+            // 이메일과 비번을 찾지 못한다 -> 제대로 기입을 안함
+            return res.status(202).json({ data: null, message: "incorrect ID or password" });
+          } else {
+            // 유저 정보 삭제하기
+            await user.destroy({ where: { email, password }});
+            // 쿠키에 토큰 삭제하기
+            await res.clearCookie("accessToken", { sameSite: "None", secure: true });
+            return res.status(200).json({ data: null, message: "Successfully account deleted"});
+          }
+        }
       }
       
       catch {
@@ -130,22 +130,20 @@ module.exports = {
       try {
         if(!email || !password) {
           // 이메일과 패쓰워드를 모두 받지 못하면 로그인 불가
-          return res.status(203).json({ data:null, message: "Please fill in all required spaces"});
+          return res.status(203).json({ message: "Please fill in all required spaces"});
         } else {
           const findUser = await user.findOne({ where: { email } });
           if(!findUser) {
             // 등록되지 않은 아이디입니다 -> 현재 system에는 쓰이지 않는다.
-            return res.status(202).json({ data: null, message: "Not registered user" });
+            return res.status(202).json({ message: "Not registered user" });
           } else {
             // password 확인하기
             const correctUser = await user.findOne({ where: { email, password }});
-            if(!correctUser) {
-              return res.status(202).json({ data: null, message : "Not correct your password"})
-            } else {
+            if(correctUser) {
               const accessToken = jwt.sign({ email }, process.env.ACCESS_SECRET, { expiresIn: "3h" });
               // email, nickname을 playload에 담은 토큰을 쿠키로 전달
               res.cookie("accessToken", accessToken, { sameSite: "None", secure: true });
-              return res.status(200).json({ data: null, message: "Successfully logged in" });
+              return res.status(200).json({ message: "Successfully logged in" });
             }
           }
         }
@@ -204,8 +202,6 @@ module.exports = {
       // 회원 수정에는 프로필, 닉네임, 패스워드 변경 기능이 있다.
       const { nickname, password, profile, newPassword} = await req.body;
 
-      // TODO: token이 언제나 있을때 사용할 수 있는 기능이므로 찾을 필요가 없다 ?? 토큰이 없을떄가 있나? -> 시간이 지나면 없다!!!!!!!
-      // TODO: expireIn 시간이 지나면 어떻게 해야하나........?
       function getCookie(name) {
         let matches = req.headers.cookie.match(new RegExp(
           "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
