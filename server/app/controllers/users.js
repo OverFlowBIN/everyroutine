@@ -21,17 +21,30 @@ module.exports = {
   // check user in db by email
   signupCheck: {
     post: async (req, res) => {
-      // email 받아오기
-      const { email } = await req.body;
 
-      // email data 있는지 확인하기
-      const findUser = await user.findOne({ where: { email}})
-      if(!findUser) {
-        return res.status(200).json({ data: email, message: "No match exists. you can make a new ID" });
-      } else {
-        return res.status(400).json({ data: null, message: "Request denied. the same email exists" });
+      try {
+        // email 받아오기
+        const { email } = await req.body;
+
+        // email data 있는지 확인하기
+        const findUser = await user.findOne({ where: { email } })
+        if(!findUser) {
+
+          // DB에 유저 아이디가 없다 -> 가입 가능하다 / 로그인은 불가능하다.
+          return res.status(200).json({ data: email, message: "No match exists. you can make a new ID" });
+        } 
+        
+        else {
+          // DB에 유저 아이디가 있다-> 가입 불가능하다 / 로그인은 가능하다.
+          return res.status(204).json({ data: null, message: "Request denied. the same email exists" });
+        }
       }
-    }
+
+       catch {
+        return res.status(400).json({ data: null, message: "Bad request" });
+      }
+    
+
   },
 
   // signup, send token
@@ -44,7 +57,7 @@ module.exports = {
 
       // default로 필요한 데이터 받아왔는지 확인 하여 데이터 DB에 넣어주기
       if(!email || !password || !nickname ) {
-        return res.status(400).json({ data: null, message: "Please fill in all required spaces"})
+        return res.status(203).json({ data: null, message: "Please fill in all required spaces"})
       } else {
         // 새로운 유저에 대한 데이터 추가 in db
         user.create({ email, password, nickname, profile });
@@ -55,6 +68,8 @@ module.exports = {
         res.status(201).json({ data: req.body , message: "Successfully created" })  
       }
     }
+
+    // TODO: catch 넣기 400번
   },
 
   // resign, clear cookie?
@@ -91,15 +106,15 @@ module.exports = {
     post: async (req, res) => {
       // 로그인을 위한 이메일, 패스워드 받기
       const { email, password } = await req.body;
-      const findUser = await user.findOne({ where: {email, password} });
+      const findUser = await user.findOne({ where: { email, password} });
 
       if(!email || !password) {
         // 이메일과 패쓰워드를 모두 받지 못하면 로그인 불가
-        return res.status(400).json({ message: "Please fill in all required spaces"});
+        return res.status(204).json({ message: "Please fill in all required spaces"});
       } else {
         if(!findUser) {
           // 등록되지 않은 아이디입니다 -> 현재 system에는 쓰이지 않는다.
-          return res.status(400).json({ message: "Not registered user" });
+          return res.status(204).json({ message: "Not registered user" });
         } else {
           // email, nickname 정보를 갖고있는 토큰 생성하기
           // TODO: nickname 넣을 필요가 있는지 확인하기
