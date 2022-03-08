@@ -178,17 +178,22 @@ module.exports = {
   userInfo: {
     get: async (req, res) => {
 
-      // 쿠키에서 토큰 가져오기
-      const { accessToken } = await req.cookie;
-      // 쿠키에서 user email 가져오기
-      console.log('accessToken-----------------', accessToken)
+      function getCookie(name) {
+        let matches = req.headers.cookie.match(new RegExp(
+          "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+      }
+
+      const accessToken = getCookie('accessToken')
+      
       const { email } = jwt.verify(accessToken, process.env.ACCESS_SECRET);
 
       try {
         if(email) {
           const userInfo = await user.findOne({ where: { email }});
           if(!userInfo) {
-            return res.status(203).json({ message: "Bad request" });
+            return res.status(203).json({ message: "please check login" });
           } else {
             return res.status(200).json({ data: userInfo, message: "Success. you can get your informations"});
           }

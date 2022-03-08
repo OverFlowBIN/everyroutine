@@ -32,7 +32,7 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use("/", userRouter);
+app.use("/users", userRouter);
 app.use("/user-routine", personalRoutineRouter);
 // app.use("/users", router);
 // app.use("/user-routine", router);
