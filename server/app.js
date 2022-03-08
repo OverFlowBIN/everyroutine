@@ -1,20 +1,11 @@
 const express = require("express");
-// const { sequelize } = require("./models"); // db.sequelize
 const app = express();
 const userRouter = require("./app/routes/users");
 const personalRoutineRouter = require("./app/routes/personal_routines");
+const groupRoutineRouter = require("./app/routes/group_routines");
 const cors = require("cors");
 
 app.set("port", process.env.PORT || 4000);
-
-// sequelize
-//   .sync({ force: false })
-//   .then(() => {
-//     console.log("데이터베이스 연결됨.");
-//   })
-//   .catch((err) => {
-//     console.error(err);
-//   });
 
 app.use(
   cors({
@@ -34,8 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/users", userRouter);
 app.use("/user-routine", personalRoutineRouter);
-// app.use("/users", router);
-// app.use("/user-routine", router);
+app.use("/group-routine", groupRoutineRouter);
 
 app.listen(app.get("port"), () => {
   console.log(app.get("port"), "port opened.");

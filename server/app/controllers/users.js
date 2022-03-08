@@ -34,7 +34,7 @@ module.exports = {
           return res.status(204).json({ data: null, message: "Request denied. the same email exists" });
         }
       } 
-      
+
       catch {
         return res.status(400).json({ message: "Bad Request" });
       }
@@ -197,8 +197,8 @@ module.exports = {
           } else {
             return res.status(200).json({ data: userInfo, message: "Success. you can get your informations"});
           }
-        }  
-      } 
+        }
+      }
       
       catch {
         return res.status(400).json({ message: "Bad request" });
@@ -211,7 +211,7 @@ module.exports = {
       // 회원 수정에는 프로필, 닉네임, 패스워드 변경 기능이 있다.
       const { nickname, password, profile, newPassword} = await req.body;
 
-
+      console.log('req.headers----------------', req.headers)
       try {
         // TODO: token이 언제나 있을때 사용할 수 있는 기능이므로 찾을 필요가 없다 ?? 토큰이 없을떄가 있나? -> 시간이 지나면 없다!!!!!!!
         // TODO: expireIn 시간이 지나면 어떻게 해야하나........?
