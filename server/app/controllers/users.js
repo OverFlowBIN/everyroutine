@@ -12,12 +12,7 @@ module.exports = {
 
 
   // test용 : user 전체 데이터 가져오기
-  users: {
-    get: async (req, res) => {
-      // console.log(models);
-      user.findAll().then((data) => res.status(200).json(data));  
-    }    
-  },
+
 
   // check user in db by email
   signupCheck: {
@@ -27,7 +22,7 @@ module.exports = {
         // email 받아오기
         const { email } = await req.body;
         // email data 있는지 확인하기
-        const findUser = await user.findOne({ where: { email}})
+        const findUser = await user.findOne({ where: { email }})
         if(!findUser) {
           return res.status(200).json({ data: email, message: "No match exists. you can make a new ID" });
         } else {
