@@ -1,5 +1,11 @@
 # EveryRoutine-Client
 
+# pull && push Step
+
+1. codestates/upstream/dev 로 반드시 full을 먼저하라
+2. elinapark0818/origin/feature 로 푸쉬하기
+3. pr 날리기!
+
 ## Structure
 
 - 메인
@@ -28,3 +34,7 @@
   - 루틴(그룹)-참여자
     - 루틴 리스트
     - 그룹루틴 상세보기
+
+## react-router-dom
+
+`npm install react-router-dom`
